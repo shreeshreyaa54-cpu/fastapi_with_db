@@ -1,18 +1,21 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from routes.user_routes import router as user_router
-from db import engine
-import os
+from db import get_db, DATABASE_URL
+from sqlalchemy import create_engine
 from models import Base
+
 app = FastAPI()
 
-app.include_router(user_router)
-
 # Create database tables if they don't exist
-Base.metadata.create_all(bind=engine)
+engine = create_engine(DATABASE_URL)
+Base.metadata.create_all(engine)
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return JSONResponse(content={"Hello": "World"})
+
+app.include_router(user_router)
 
 
 if __name__ == "__main__":
